@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+<script type="text/javascript" src="http://canvg.github.io/canvg/rgbcolor.js"></script> 
+<script type="text/javascript" src="http://canvg.github.io/canvg/StackBlur.js"></script>
+<script type="text/javascript" src="http://canvg.github.io/canvg/canvg.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+<style>
+
+</style>
+
+  </head>
+
+  <body>
+
+<div class="toppanel" id="toppanel">
+    <div class="name">MGRID</div>
+    <div class="desc"></div>
+    <div class="feedback">Made with <i class="fa fa-coffee" aria-hidden="true"></i> by <a href="http://twitter.com/as_osipov">Anton Osipov</a></div>
+</div>
+
+  <div class="panel" id="panel">
+
+    <div class="gridswitch padding-left">
+
+<input type="button" onclick="switchGrid(0)" class="switchbtn btnroundleft" id="switchGrid0" value="GRID 1"></input>
+<input type="button" onclick="switchGrid(1)" class="switchbtn" id="switchGrid1" style="display: none;" value="GRID 2"></input>
+<input type="button" onclick="switchGrid(2)" class="switchbtn btnroundright" id="switchGrid2" style="display: none;" value="GRID 3"></input>
+<button type="submit" onclick="addGrid()" class="switchbtn addswitchbtn btnroundright" id="addGrid"><i class="fa fa-plus" aria-hidden="true"></i></button>
+
+</div>
+
+<switch id="switchvis" class="switchvis padding-left" onclick="switchVisibility()">
+  <svg style="width:130px; height:14px;"></svg>
+</switch>
+
+<div class="devider-xs"></div>
+
+
+
+<canvas style="display:none"></canvas>
+<div id="svgdataurl"></div>
+<div id="pngdataurl"></div>
+
+
+
+    <div class="subtitle padding-left">PAPER SIZE</div>
+    
+    <div class="paperSize padding-left">
+        <input type="button" onclick="paperSize()" class="dropbtn" id="dropdownTitle"></input>
+        <div id="paperSizeList" class="dropdown-content">
+            <div class="dropdownButton" onclick="changePaper(0)">MacBook 13</div>
+            <div class="dropdownButton" onclick="changePaper(1)">iMac 27</div>
+            <div class="dropdownButton" onclick="changePaper(2)">A4 Horizontal</div>
+            <div class="dropdownButton" onclick="changePaper(3)">A4 Vertical</div>
+            <div class="dropdownButton" onclick="changePaper(4)">PowerPoint Standard 4:3</div>
+            <div class="dropdownButton" onclick="changePaper(5)">PowerPoint Widescreen 16:9</div>
+        </div>
+    </div>
+
+      <div class="spnr padding-left">
+        <div class="spnr-title">Width</div>
+        <input type="text" id="spnr-in-ppr-wdth" class="spnr-in-ppr" 
+        onkeydown="arrows(this,'paperWidth')"
+        onkeyup="enterValue(this,'paperWidth')"
+        onfocusout="enterValue(this,'paperWidth','click')" value=2540>
+        <div class="spnr-units"></div>
+      </div>
+
+      <div class="spnr">
+        <div class="spnr-title">Height</div>
+        <input type="text" id="spnr-in-ppr-hght" class="spnr-in-ppr" 
+        onkeydown="arrows(this,'paperHeight')"
+        onkeyup="enterValue(this,'paperHeight')"
+        onfocusout="enterValue(this,'paperHeight','click')"  value=1905>
+        <div class="spnr-units"></div>
+      </div>
+
+    <script>
+
+
+function switchGrid(gridNumber) {
+    if(gridVisible[gridNumber])
+        {
+            switchGridVis(1);
+        }
+        else
+        {
+            switchGridVis(0);
+        }
+
+    cG=gridNumber;
+
+    var tmp1, tmp2;
+    switch(cG) 
+    {
+        case 0: tmp1=1; tmp2=2; break;
+        case 1: tmp1=0; tmp2=2; break;
+        case 2: tmp1=0; tmp2=1; break;
+    }
+
+    document.getElementById("switchGrid"+tmp1).style.background=switchBackDis;
+    document.getElementById("switchGrid"+tmp2).style.background=switchBackDis;
+    document.getElementById("switchGrid"+cG).style.background=switchBackEn;
+    controlsUpdate();
+}
+
+function switchGridVis(state) {
+    if (state)
+    {
+        switchVis.select("circle")
+        .transition()
+        .style("fill",mainColor)
+        .attr("cx",21);
+
+        switchVis.select("text")
+        .style("fill",mainColor)
+        .attr("x",38)
+        .text("Hide This Grid");
+    }
+    else
+    {
+        switchVis.select("circle")
+        .transition()
+        .style("fill","#766390")
+        .attr("cx",7);
+
+        switchVis.select("text")
+        .style("fill","#766390")
+        .attr("x",33)
+        .text("Show This Grid");
+    }
+}
+
+
+function addGrid() {
+    if(gridEnable[1]==0)
+    {
+        gridEnable[1]=1;
+        gridVisible[1]=1;
+        cG=1;
+        document.getElementById("switchGrid1").style.display = "inline";
+        document.getElementById("switchvis").style.visibility = "visible";
+        switchGrid(1);
+    } 
+    else 
+    {
+        gridEnable[2]=1;
+        gridVisible[2]=1;
+        cG=2;
+        document.getElementById("switchGrid2").style.display = "inline";
+        document.getElementById("addGrid").style.visibility = "hidden";
+        switchGrid(2);
+    }
+    switchGridVis(1);
+    drawGrid();
+}
+
+function switchVisibility() {
+    if (gridVisible[cG])
+    {
+        gridVisible[cG]=0;
+        switchGridVis(0);
+    }
+    else
+    {
+        gridVisible[cG]=1;
+        switchGridVis(1);
+    }
+    drawGrid();
+}
+
+
+
+        /* When the user clicks on the button, 
+        toggle between hiding and showing the dropdown content */
+        function paperSize() {
+            document.getElementById("paperSizeList").classList.toggle("show");
+        }
+
+        // Close the dropdown menu if the user clicks outside of it
+        window.onclick = function(event) {
+          if (!event.target.matches('.dropbtn')) {
+
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            var i;
+            for (i = 0; i < dropdowns.length; i++) {
+              var openDropdown = dropdowns[i];
+              if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+              }
+            }
+          }
+        }
+
+        function changePaper (id){
+            
+        switch(id)
+            {
+                case 0:
+                document.getElementById("dropdownTitle").value = "MacBook 13  ▾";
+                paperWidth = 2560;
+                paperHeight = 1600;
+
+                columnsAmnt = [12,6,3];
+                columnWidth = [128,288,608];
+                gutterWidth = [32,32,32];
+                rowsAmnt = [1,1,1];
+                rowHeight = [1400,1400,1400];
+                gutterHeight = [0,0,0];
+                units = "px";
+                break;
+
+                case 1:
+                document.getElementById("dropdownTitle").value = "iMac 27  ▾";
+                paperWidth = 5120;
+                paperHeight = 2880;
+
+                columnsAmnt = [12,6,3];
+                columnWidth = [200,480,1040];
+                gutterWidth = [80,80,80];
+                rowsAmnt = [1,1,1];
+                rowHeight = [2400,2400,2400];
+                gutterHeight = [0,0,0];
+                units = "px";
+                break;
+
+                case 2:
+                document.getElementById("dropdownTitle").value = "A4 Horizontal  ▾";
+                paperWidth = 29.7;
+                paperHeight = 21.0;
+
+                columnsAmnt = [2,4,4];
+                columnWidth = [13,6,6];
+                gutterWidth = [1,1,1];
+                rowsAmnt = [10,10,4];
+                rowHeight = [1,1,4];
+                gutterHeight = [1,1,1];
+                units = "mm";
+                break;
+
+                case 3:
+                document.getElementById("dropdownTitle").value = "A4 Vertical  ▾";
+                paperWidth = 21.0;
+                paperHeight = 29.7;
+
+                columnsAmnt = [2,2,5];
+                columnWidth = [8,8,2];
+                gutterWidth = [2,2,2];
+                rowsAmnt = [14,14,14];
+                rowHeight = [1,1,1];
+                gutterHeight = [1,1,1];
+                units = "mm";
+                break;
+
+                case 4:
+                document.getElementById("dropdownTitle").value = "PowerPoint Standard 4:3  ▾";
+                paperWidth = 2540;
+                paperHeight = 1905;
+
+                columnsAmnt = [6,3,2];
+                columnWidth = [320,700,700];
+                gutterWidth = [60,60,60];
+                rowsAmnt = [4,3,2];
+                rowHeight = [320,445,320];
+                gutterHeight = [60,60,60];
+                units = "px";
+                break;
+
+                case 5:
+                document.getElementById("dropdownTitle").value = "PowerPoint Standard 16:9  ▾";
+                paperWidth = 2540;
+                paperHeight = 1430;
+
+                columnsAmnt = [6,3,2];
+                columnWidth = [320,700,700];
+                gutterWidth = [60,60,60];
+                rowsAmnt = [4,2,2];
+                rowHeight = [240,540,240];
+                gutterHeight = [60,60,60];
+                units = "px";
+                break;
+            }
+
+            for (var j=0; j<3; j++)
+            {
+                width[j]=calcWidth(columnsAmnt[j], columnWidth[j], gutterWidth[j]);
+                height[j]=calcHeight(rowsAmnt[j], rowHeight[j], gutterHeight[j]);                
+            }
+
+            switchGrid(0);
+            gridEnable = [1,0,0];
+            gridVisible = [1,0,0];
+            document.getElementById("switchGrid1").style.display = "none";
+            document.getElementById("switchGrid2").style.display = "none";
+            document.getElementById("addGrid").style.visibility = "visible";
+            document.getElementById("switchvis").style.visibility = "hidden";
+
+            document.getElementsByClassName("spnr-units")[0].innerHTML=units;
+            document.getElementsByClassName("spnr-units")[1].innerHTML=units;
+
+
+            drawGrid();
+        }
+
+
+    
+
+    </script>
+
+
+      <div class="subtitle padding-left">GRID SETTINGS</div>
+        
+
+      <div class="spnr padding-left">
+<div class="spnr-title full-width">Columns</div>
+
+
+          <button class="spnr-btn spnr-btn-left" onclick="
+                if (columnsAmnt[cG]>1)
+                {
+                columnsAmnt[cG]--; 
+                document.getElementById('spnr-in-clmn-amnt').value=columnsAmnt[cG]; 
+                drawGrid(); 
+                width[cG] = calcWidth(columnsAmnt[cG], columnWidth[cG], gutterWidth[cG]);
+                controlsUpdate();                
+                }">
+            <img src="svg/dec.svg"/>
+            </button>
+
+        <input type="text" id="spnr-in-clmn-amnt" class="spnr-in-2" 
+        onkeydown="arrows(this,'columnsAmnt')"
+        onkeyup="enterValue(this,'columnsAmnt','enter')" 
+        onfocusout="enterValue(this,'columnsAmnt','click')" value=12>
+
+          <button class="spnr-btn spnr-btn-right" 
+            onclick="
+            var tmp=calcWidth(columnsAmnt[cG]+1,columnWidth[cG],gutterWidth[cG]);
+            if (tmp<=paperWidth)
+            {
+            columnsAmnt[cG]++; 
+            document.getElementById('spnr-in-clmn-amnt').value=columnsAmnt[cG]; 
+            drawGrid(); 
+            width[cG] = calcWidth(columnsAmnt[cG], columnWidth[cG], gutterWidth[cG]);            
+            controlsUpdate();                
+            }">
+            <img src="svg/inc.svg"/>
+          </button>
+      </div>
+
+      <div class="spnr">
+              <div class="spnr-title full-width">Rows</div>
+
+          <button class="spnr-btn  spnr-btn-left" 
+            onclick="
+            if (rowsAmnt[cG]>1)
+            {
+            rowsAmnt[cG]--; 
+            document.getElementById('spnr-in-row-amnt').value=rowsAmnt[cG]; 
+            drawGrid(); 
+            height[cG] = calcHeight(rowsAmnt[cG], rowHeight[cG], gutterHeight[cG]);
+            controlsUpdate();             
+            }">
+            <img src="svg/dec.svg"/>
+            </button>
+
+        <input type="text" id="spnr-in-row-amnt" class="spnr-in-2" 
+        onkeydown="arrows(this,'rowsAmnt')"
+        onkeyup="enterValue(this,'rowsAmnt','enter')"
+        onfocusout="enterValue(this,'rowsAmnt','click')" value=12>
+
+          <button class="spnr-btn  spnr-btn-right" 
+            onclick="
+            var tmp=calcHeight(rowsAmnt[cG]+1,rowHeight[cG],gutterHeight[cG])
+            if (tmp<=paperHeight)
+            {
+            rowsAmnt[cG]++; 
+            document.getElementById('spnr-in-row-amnt').value=rowsAmnt[cG]; 
+            drawGrid(); 
+            height[cG] = calcHeight(rowsAmnt[cG], rowHeight[cG], gutterHeight[cG]);
+            controlsUpdate();                
+            }">
+            <img src="svg/inc.svg"/>
+          </button>
+
+      </div>
+
+<div class="devider-s"></div>
+
+      <div class="spnr padding-left">
+              <div class="spnr-title">Total Width</div>
+        <input type="text" id="spnr-in-width" class="spnr-in-4" 
+        onkeydown="arrows(this,'width')"
+        onkeyup="enterValue(this,'width','enter')" 
+        onfocusout="enterValue(this,'width','click')" value=960>
+      </div>  
+
+      <div class="spnr">
+      <div class="spnr-title">Total Height</div>
+        <input type="text" id="spnr-in-height" class="spnr-in-4" 
+        onkeydown="arrows(this,'height')"
+        onkeyup="enterValue(this,'height','enter')" 
+        onfocusout="enterValue(this,'height','click')" value=960>        
+      </div>  
+
+
+      <div class="subtitle padding-left">BLOCKS SETTINGS</div>
+
+
+              <div class="spnr padding-left">
+                <div class="spnr-title">Column Width</div>
+                <input type="text" id="spnr-in-clmn-wdth" class="spnr-in-4" 
+                onkeydown="arrows(this,'columnWidth')"
+                onkeyup="enterValue(this,'columnWidth','enter')" 
+                onfocusout="enterValue(this,'columnWidth','click')" value=60>
+              </div>    
+
+              <div class="spnr">
+                <div class="spnr-title">Row Height</div>
+                <input type="text" id="spnr-in-row-hght" class="spnr-in-4" 
+                onkeydown="arrows(this,'rowHeight')"
+                onkeyup="enterValue(this,'rowHeight','enter')" 
+                onfocusout="enterValue(this,'rowHeight','click')" value=30>
+              </div>     
+<div class="devider-s"></div>
+
+              <div class="spnr padding-left gutter-width">
+                <div class="spnr-title-g">Gutter Width</div>
+                <input type="text" id="spnr-in-gttr-wdth" class="spnr-in-3" 
+                onkeydown="arrows(this,'gutterWidth')"
+                onkeyup="enterValue(this,'gutterWidth','enter')" 
+                onfocusout="enterValue(this,'gutterWidth','click')" value=20>
+              </div>     
+
+              <div class="spnr gutter-width">
+                <div class="spnr-title-g">Gutter Height</div>
+                <input type="text" id="spnr-in-gttr-hght" class="spnr-in-3" 
+                onkeydown="arrows(this,'gutterHeight')" 
+                onkeyup="enterValue(this,'gutterHeight','enter')" 
+                onfocusout="enterValue(this,'gutterHeight','click')" value=10>
+              </div>      
+
+
+<!--
+
+      <table><tbody>
+        <tr>
+          <td>
+          </td>
+          <td width="150px" height="50px">
+
+              <div class="spnr corr-cw">
+                <input type="text" id="spnr-in-clmn-wdth" class="spnr-in-4" onkeyup="enterValue(this,'columnWidth')" value=60>
+                <div class="spnr-title">Column Width</div>
+              </div>    
+
+          </td>
+          <td>
+          </td>
+          <td width="20px">
+          </td>
+        </tr>
+        <tr>
+          <td width="70px">
+
+              <div class="spnr-left">
+                <div class="spnr-title-gw" style="text-align: right;">Row Height</div>
+                <input type="text" id="spnr-in-row-hght" class="spnr-in-3" onkeyup="enterValue(this,'rowHeight')" value=30>
+              </div>     
+
+          </td>
+          <td bgcolor="#9d8fb0" width="150px" height="100px">
+
+            <svg height="12" width="150" style="vertical-align: top;">
+                <line x1="9" y1="8" x2="139" y2="8" style="stroke:white; stroke-width:1" />
+                <polygon points="7,8 18,5 18,11"  style="fill:white"/>
+                <polygon points="144,8 133,5 133,11"  style="fill:white"/>
+            </svg>         
+            <svg height="78" width="11" style="vertical-align: top;">
+                <line x1="8" y1="2" x2="8" y2="69" style="stroke:white; stroke-width:1" />
+                <polygon points="8,0 5,11 11,11"  style="fill:white"/>
+                <polygon points="8,72 5,61 11,61"  style="fill:white"/>
+            </svg> 
+          </td>
+          <td bgcolor="#4f3670" width="80px">
+
+              <div class="spnr-left">
+                <div class="spnr-title-gw">Gutter Width</div>
+                <input type="text" id="spnr-in-gttr-wdth" class="spnr-in-3" onkeyup="enterValue(this,'gutterWidth')" value=20>
+              </div>     
+
+            <svg height="7" width="80" style="vertical-align: bottom">
+                <line x1="7" y1="3" x2="65" y2="3" style="stroke:white; stroke-width:1" />
+                <polygon points="4,3 15,0 15,6"  style="fill:white"/>
+                <polygon points="76,3 65,0 65,6"  style="fill:white"/>
+            </svg> 
+
+          </td>
+          <td bgcolor="#9d8fb0">
+          </td>
+        </tr>
+        <tr>
+          <td>
+          </td>
+          <td bgcolor="#4f3670">
+
+              <div class="spnr corr-gh">
+                <input type="text" id="spnr-in-gttr-hght" class="spnr-in-3" onkeyup="enterValue(this,'gutterHeight')" value=10>
+                <div class="spnr-title">Gutter Height</div>
+              </div>      
+
+            <svg height="50" width="7" style="vertical-align: bottom">
+                <line x1="3" y1="14" x2="3" y2="36" style="stroke:white; stroke-width:1" />
+                <polygon points="3,4 0,15 6,15"  style="fill:white"/>
+                <polygon points="3,46 0,35 6,35"  style="fill:white"/>
+            </svg>               
+
+          </td>
+          <td width="80px" height="50px">
+          </td>
+          <td bgcolor="#4f3670">
+          </td>
+        </tr>  
+        <tr height="20px">
+          <td>
+          </td>
+          <td bgcolor="#9d8fb0">
+          </td>
+          <td bgcolor="#4f3670">
+          </td>
+          <td bgcolor="#9d8fb0" width="30px" height="20px">
+          </td>
+        </tr></tbody>      
+      </table>
+
+
+-->
+
+  </div>
+
+  <paper style="position: absolute;">
+    <svg id="mainSVG" style="position: absolute;"><rect class="paperrect"></rect></svg>
+    
+  </paper>
+  <div class="options">
+    <div class="option" style="cursor:pointer;" onclick="savePNG('paperCalcWidth','paperCalcHeight')">PICTURE</div>
+    <div class="option" style="cursor:pointer;" onclick="saveSVG('paperCalcWidth','paperCalcHeight')">VECTOR</div>
+    </div>
+
+    <script>
+    var cG = 0;
+    var gridEnable=[1,0,0];
+    var gridVisible=[1,0,0];
+
+    var mainColor = "#16E1E3";
+
+    var colorGridVert = ["#0092D7","#8C6600","#541D00"];
+    var colorGridHor = [mainColor,"#8C6600","#541D00"];
+
+    var colorGridHorFill = ["transparent","#FFCC40","#FF7627"];
+    var colorGridVertFill = ["transparent","#FFBA00","#FF7627"];
+    var opacityGridHor = [1,0.3,0.25];
+    var opacityGridvert = [1,0.3,0.25];
+
+    var switchBackDis="#766390";
+    var switchBackEn=mainColor;
+    document.getElementById("switchGrid0").style.background=switchBackEn;
+
+    var currentPaper="PowerPoint Standard 4:3  ▾";
+    document.getElementById("dropdownTitle").value = currentPaper;
+    var paperWidth=2540;
+    var paperHeight=1905;
+    var paperScale;
+
+
+      var columnsAmnt=[6,3,2];
+      var columnWidth=[320,700,700];
+      var gutterWidth=[60,60,60];
+      var width=[];
+        for (var j=0; j<3; j++)
+        {
+            width[j]=calcWidth(columnsAmnt[j], columnWidth[j], gutterWidth[j]);
+        }
+
+
+      var rowsAmnt=[4,3,2];
+      var rowHeight=[320,445,320];
+      var gutterHeight=[60,60,60];
+      var height=[];
+      for (var j=0; j<3; j++)
+        {
+            height[j]=calcHeight(rowsAmnt[j], rowHeight[j], gutterHeight[j]);
+        }
+
+      var units="px";
+      document.getElementsByClassName("spnr-units")[0].innerHTML="px";
+      document.getElementsByClassName("spnr-units")[1].innerHTML="px";
+
+      controlsUpdate();
+
+      var switchVis=d3.select("switch").select("svg");
+
+switchVis.append("rect")
+.attr("x",1)
+.attr("y",1)
+.attr("width",26)
+.attr("height",12)
+.attr("stroke",mainColor)
+.attr("fill","#321954")
+.attr("rx",6)
+.attr("ry",6);
+
+switchVis.append("circle")
+.attr("cx",21)
+.attr("cy",7)
+.attr("r",4)
+.style("fill",mainColor);
+
+switchVis.append("text")
+.text("Hide This Grid")
+.attr("width",100)
+.attr("height",24)
+.attr("x",38)
+.attr("y",11)
+.attr("fill",mainColor)
+.attr("font-weight",400)
+.attr("font-size","12");
+
+document.getElementById("switchvis").style.visibility = "hidden";
+
+
+
+function arrows(key,id) {
+    if(event.keyCode == 38) {key.value++;enterValue(key,id,"arrow");}
+    if(event.keyCode == 40) {key.value--;enterValue(key,id,"arrow");}
+}
+
+
+
+      function enterValue(key,id,flag) {
+//        if((event.keyCode > 47 && event.keyCode<58) || (event.keyCode==8) || (event.keyCode==13) || (event.keyCode==46)) {
+    if(event.keyCode == 27)
+    {
+        controlsUpdate();
+    document.getElementById('spnr-in-ppr-wdth').blur();
+    document.getElementById('spnr-in-clmn-amnt').blur();
+    document.getElementById('spnr-in-clmn-wdth').blur();
+    document.getElementById('spnr-in-gttr-wdth').blur();
+    document.getElementById('spnr-in-width').blur();
+    document.getElementById('spnr-in-ppr-hght').blur();
+    document.getElementById('spnr-in-row-amnt').blur();
+    document.getElementById('spnr-in-row-hght').blur();
+    document.getElementById('spnr-in-gttr-hght').blur();
+    document.getElementById('spnr-in-height').blur();
+    } 
+
+
+
+        if((event.keyCode == 13) || (flag=="click") || (flag=="arrow")) 
+        {
+        var tmp;
+          switch(id)
+          {
+            case "paperWidth":
+            if (paperWidth!=key.value && key.value>0)
+            {
+                paperWidth=key.value;
+                paperSizeRecalc();
+                document.getElementById("dropdownTitle").value = "Custom Size  ▾";
+            }
+            else
+            {
+            }
+            break;
+
+            case "paperHeight":
+            if (paperHeight!=key.value && key.value>0)
+            {
+                paperHeight=key.value;
+                paperSizeRecalc();
+                document.getElementById("dropdownTitle").value = "Custom Size  ▾";
+            }
+            else
+            {
+            }
+            break;
+
+            case "columnsAmnt":
+            tmp=calcWidth(key.value,columnWidth[cG],gutterWidth[cG]);
+            if (tmp<=paperWidth && key.value>0)
+            {
+                columnsAmnt[cG]=key.value;
+                width[cG]=tmp;
+            }
+            else
+            {
+            }
+   //         document.getElementById('spnr-in-clmn-amnt').value=columnsAmnt[cG];           
+            break;
+
+            case "width":
+            if (key.value<=paperWidth && key.value>columnsAmnt[cG])
+            {
+                //var possibleNegative= (key.value-width[cG])/columnsAmnt[cG];
+                columnWidth[cG]=Math.round(   100*((key.value-gutterWidth[cG]*(columnsAmnt[cG]-1))/columnsAmnt[cG])   )/100;
+/*
+                if (possibleNegative>=0)
+                {columnWidth[cG]=columnWidth[cG]+possibleNegative;}
+                else {columnWidth[cG]=columnWidth[cG]-(width[cG]-key.value)/columnsAmnt[cG];}
+*/
+                if(columnWidth[cG]<1)
+                {
+  /*                  var tmp1=(columnsAmnt[cG]-columnWidth[cG])/(columnsAmnt[cG]-1);
+                    gutterWidth[cG]=gutterWidth[cG]-tmp1;*/
+                    gutterWidth[cG]=Math.round(   100*((key.value-columnsAmnt[cG])/(columnsAmnt[cG]-1))   )/100;
+                    columnWidth[cG]=1;
+                }
+/*                {gutterWidth[cG]=gutterWidth[cG]+possibleNegative;}
+                else {gutterWidth[cG]=gutterWidth[cG]-(width[cG]-key.value)/(columnsAmnt[cG]-1);}
+                
+                if(gutterWidth[cG]<1)
+                {
+                    columnWidth[cG]=columnWidth[cG]-(-gutterWidth[cG]+1)/columnsAmnt[cG];
+                    gutterWidth[cG]=1;
+                }*/
+                width[cG]=key.value;                
+            }
+            else
+            {
+            }            
+  //          document.getElementById('spnr-in-gttr-wdth').value=gutterWidth[cG]; 
+  //          document.getElementById('spnr-in-clmn-wdth').value=columnWidth[cG]; 
+            break;
+
+            case "rowsAmnt":
+            tmp=calcHeight(key.value,rowHeight[cG],gutterHeight[cG])
+            if (tmp<=paperHeight && key.value>0)
+            {
+                rowsAmnt[cG]=key.value;
+                height[cG]=tmp;
+            }
+            else
+            {
+            }
+  //          document.getElementById('spnr-in-row-amnt').value=rowsAmnt[cG]; 
+            break;
+
+            case "height":
+            if (key.value<=paperHeight && key.value>0)
+            {
+                rowHeight[cG]=Math.round(   100*((key.value-gutterHeight[cG]*(rowsAmnt[cG]-1))/rowsAmnt[cG])   )/100;
+/*                var possibleNegative=(key.value-height[cG])/rowsAmnt[cG];
+                if (possibleNegative>=0)
+                {rowHeight[cG]=rowHeight[cG]+possibleNegative}
+                else {rowHeight[cG]=rowHeight[cG]-(height[cG]-key.value)/rowsAmnt[cG]}*/
+                
+                if(rowHeight[cG]<1)
+                {
+//                    gutterHeight[cG]=gutterHeight[cG]-(-rowHeight[cG]+1)/(rowsAmnt[cG]-1);
+                    gutterHeight[cG]=Math.round(   100*((key.value-rowsAmnt[cG])/(rowsAmnt[cG]-1))   )/100;
+                    rowHeight[cG]=1;
+                }
+
+/*                {gutterHeight[cG]=gutterHeight[cG]+possibleNegative}
+                else {gutterHeight[cG]=gutterHeight[cG]-(height[cG]-key.value)/(rowsAmnt[cG]-1)}
+                
+                if(gutterHeight[cG]<1)
+                {
+                    rowHeight[cG]=rowHeight[cG]-(-gutterHeight[cG]+1)/rowsAmnt[cG];
+                    gutterHeight[cG]=1;
+                }*/
+                height[cG]=key.value;
+            }
+            else
+            {
+            }
+ //           document.getElementById('spnr-in-gttr-hght').value=gutterHeight[cG];
+ //           document.getElementById('spnr-in-row-hght').value=rowHeight[cG];
+            break;
+
+            case "columnWidth":
+            tmp=calcWidth(columnsAmnt[cG],key.value,gutterWidth[cG]);
+            if (tmp<=paperWidth && key.value>0)
+            {
+                columnWidth[cG]=key.value;
+                width[cG]=tmp;
+            }
+            else
+            {
+            }
+ //           document.getElementById('spnr-in-clmn-wdth').value=columnWidth[cG]; 
+            break;
+
+            case "rowHeight":
+            tmp=calcHeight(rowsAmnt[cG],key.value,gutterHeight[cG]);
+            if (tmp<=paperHeight && key.value>0)
+            {
+                rowHeight[cG]=key.value;
+                height[cG]=tmp;
+            }
+            else
+            {
+            }                        
+//            document.getElementById('spnr-in-row-hght').value=rowHeight[cG]; 
+            break;             
+
+            case "gutterWidth":
+            tmp=calcWidth(columnsAmnt[cG],columnWidth[cG],key.value);
+            if (tmp<=paperWidth && key.value>0)
+            {
+                gutterWidth[cG]=key.value;
+                width[cG]=tmp;
+            }
+            else
+            {
+            }
+//            document.getElementById('spnr-in-gttr-wdth').value=gutterWidth[cG]; 
+            break;
+
+            case "gutterHeight":
+            tmp=calcHeight(rowsAmnt[cG],rowHeight[cG],key.value);
+            if (tmp<=paperHeight && key.value>0)
+            {
+                gutterHeight[cG]=key.value;
+                height[cG]=tmp;
+            }
+            else
+            {
+            }            
+//            document.getElementById('spnr-in-gttr-hght').value=gutterHeight[cG]; 
+            break; 
+          }
+//          document.getElementById('spnr-in-width').value=width[cG];
+//          document.getElementById('spnr-in-height').value=height[cG]; 
+          controlsUpdate();
+          drawGrid();
+        }
+      }
+
+    
+    paperSizeRecalc();
+
+    function paperSizeRecalc(){
+        
+        var panelWidth = document.getElementById("panel").clientWidth;
+        var toppanelHeight = document.getElementById("toppanel").clientHeight;
+        var paperCenterX = (window.outerWidth - panelWidth) / 2;
+        var paperCenterY = window.outerHeight / 2 - toppanelHeight;
+
+        if (paperWidth > paperHeight)
+        {
+            paperScale = (0.7 * paperCenterX*2) / paperWidth;
+        }
+        else
+        { 
+            paperScale = (0.7 * paperCenterY*2) / paperHeight; 
+        }
+        var paperCalcWidth = paperScale * paperWidth;
+        var paperCalcHeight = paperScale * paperHeight;
+
+        var x = paperCenterX - paperCalcWidth/2;
+        var y = paperCenterY - paperCalcHeight/2;
+
+        var positionSVG = document.getElementById("mainSVG");
+        positionSVG.style.left = x;
+        positionSVG.style.top = y;
+        positionSVG.style.width = paperCalcWidth;
+        positionSVG.style.height = paperCalcHeight;
+
+        d3.select("paper").select("svg").select("rect")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("width",paperCalcWidth)
+        .attr("height",paperCalcHeight)
+        .attr("fill","#ffffff")
+        .attr("opacity",1);
+
+        var tx=panelWidth+x;
+        var ty=y+toppanelHeight-30;
+        var options = document.getElementsByClassName("options");
+        options[0].style.left = tx+"px";
+        options[0].style.top = ty+"px";
+        options[0].style.width = paperCalcWidth+"px";
+        options[0].style.height = "30px";
+
+        return [paperScale, x, y];
+    }
+/*
+    var paperWidth=2540;
+    var paperHeight=1905;
+
+      var columnsAmnt=12;
+      var width=960;
+      var columnWidth=60;
+      var rowHeight=30;
+      var gutterWidth=20;
+      var gutterHeight=10;
+*/
+
+var tmpGroupRows = [];
+var tmpGroupColumns = [];
+
+for (var j=0; j<3; j++)
+{
+    tmpGroupRows[j] =   d3.select("paper").select("svg").append("g");
+    tmpGroupColumns[j] = d3.select("paper").select("svg").append("g");    
+}
+
+var groupRows = [tmpGroupRows[2], tmpGroupRows[1], tmpGroupRows[0]];
+var groupColumns = [tmpGroupColumns[2], tmpGroupColumns[1], tmpGroupColumns[0]];
+
+drawGrid();
+
+function drawGrid(){
+    
+    var tmpRecalc = paperSizeRecalc();
+    var paperScale = tmpRecalc[0];
+    var paperLeftCornerX = tmpRecalc[1];
+    var paperLeftCornerY = tmpRecalc[2];
+
+    var outerSpaceX = [];
+    var outerSpaceY = [];
+
+    for (var j=0; j<3; j++)
+    {
+        outerSpaceX[j] = (paperWidth - columnsAmnt[j]*columnWidth[j] - (columnsAmnt[j]-1)*gutterWidth[j]) / 2;
+        outerSpaceY[j] = (paperHeight - rowsAmnt[j]*rowHeight[j] - (rowsAmnt[j]-1)*gutterHeight[j]) / 2;
+    }
+
+    for (var j=0; j<3; j++)
+    {
+        groupRows[j].selectAll("rect").remove();
+
+        if (gridVisible[j])
+        {
+            for (var i = 0; i<rowsAmnt[j]; i++)
+            {
+                groupRows[j].append("rect")
+                .attr("x", 0*paperLeftCornerX + paperScale * outerSpaceX[j])
+                .attr("y", 0*paperLeftCornerY + paperScale * (outerSpaceY[j]+i*(10*rowHeight[j]/10+10*gutterHeight[j]/10)) )
+                .attr("width",paperScale * (paperWidth - 2*outerSpaceX[j]))
+                .attr("height",paperScale * rowHeight[j])
+                .attr("fill",colorGridHorFill[j])
+                .attr("opacity",opacityGridHor[j])
+                .attr("stroke",colorGridHor[j])
+                .attr("stroke-width",1)
+                .style("stroke-dasharray","4,2");
+            }
+        }
+    }
+
+    for (var j=0; j<3; j++)
+    {
+        groupColumns[j].selectAll("rect").remove();
+
+        if (gridVisible[j])
+        {
+            for (var i = 0; i<columnsAmnt[j]; i++)
+            {
+                groupColumns[j].append("rect")
+                .attr("x", 0*paperLeftCornerX + paperScale * (outerSpaceX[j]+i*(10*columnWidth[j]/10+10*gutterWidth[j]/10)) )
+                .attr("y", 0*paperLeftCornerY + paperScale * outerSpaceY[j] )
+                .attr("width",paperScale * columnWidth[j])
+                .attr("height",paperScale * (paperHeight - 2*outerSpaceY[j]))
+                .attr("fill",colorGridVertFill[j])
+                .attr("opacity",opacityGridvert[j])
+                .attr("stroke",colorGridVert[j])
+                .attr("stroke-width",2);
+            }
+        }
+    }    
+}
+
+function calcWidth(cA, cW, gW)  {return cA*cW + (cA-1)*gW;}
+function calcHeight(rA, rH, gH)  {return rA*rH + (rA-1)*gH;}
+
+function controlsUpdate(){
+    document.getElementById('spnr-in-ppr-wdth').value=paperWidth; 
+    document.getElementById('spnr-in-clmn-amnt').value=columnsAmnt[cG];
+    document.getElementById('spnr-in-clmn-wdth').value=columnWidth[cG]; 
+    document.getElementById('spnr-in-gttr-wdth').value=gutterWidth[cG]; 
+    document.getElementById('spnr-in-width').value=width[cG];
+    document.getElementById('spnr-in-ppr-hght').value=paperHeight; 
+    document.getElementById('spnr-in-row-amnt').value=rowsAmnt[cG]; 
+    document.getElementById('spnr-in-row-hght').value=rowHeight[cG];
+    document.getElementById('spnr-in-gttr-hght').value=gutterHeight[cG]; 
+    document.getElementById('spnr-in-height').value=height[cG]; 
+}
+
+
+
+
+
+
+
+
+ function saveSVG(paperCalcWidth,paperCalcHeight){
+  var html = d3.select("paper").select("svg")
+        .attr("version", 1.1)
+        .attr("xmlns", "http://www.w3.org/2000/svg")
+        .node().parentNode.innerHTML;
+
+  //console.log(html);
+  var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
+/*  var img = '<img src="'+imgsrc+'">'; 
+  d3.select("#svgdataurl").html(img);
+
+
+d3.select("canvas").attr("width",paperCalcWidth).attr("height",paperCalcHeight);
+
+var canvas = document.querySelector("canvas"),
+      context = canvas.getContext("2d");
+
+canvg(canvas, imgsrc);
+
+var canvasdata = canvas.toDataURL("image/png");
+*/
+
+//      var pngimg = '<img src="'+canvasdata+'">'; 
+//      d3.select("#pngdataurl").html(pngimg);
+
+/*
+      var a = document.createElement("a");
+      a.download = "grid.png";
+      a.href = canvasdata;
+      a.click();
+*/
+      var a2 = document.createElement("a");
+      a2.download = "grid.svg";
+      a2.href = imgsrc;
+      a2.click();
+
+/*  
+
+  var image = new Image;
+  image.src = imgsrc;
+  image.onload = function() {
+      context.drawImage(image, 0, 0);//test
+
+      var canvasdata = canvas.toDataURL("image/png");
+
+      var pngimg = '<img src="'+canvasdata+'">'; 
+      d3.select("#pngdataurl").html(pngimg);
+
+
+      var a = document.createElement("a");
+      a.id = "imagepng";//test
+      a.download = "sample.png";
+      a.href = canvasdata;
+      a.click();
+    };*/
+  };
+
+
+
+ function savePNG(paperCalcWidth,paperCalcHeight){
+  var html = d3.select("paper").select("svg")
+        .attr("version", 1.1)
+        .attr("xmlns", "http://www.w3.org/2000/svg")
+        .node().parentNode.innerHTML;
+
+  //console.log(html);
+  var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
+/*  var img = '<img src="'+imgsrc+'">'; 
+  d3.select("#svgdataurl").html(img);
+*/
+
+d3.select("canvas").attr("width",paperCalcWidth).attr("height",paperCalcHeight);
+
+var canvas = document.querySelector("canvas"),
+      context = canvas.getContext("2d");
+
+canvg(canvas, imgsrc);
+
+var canvasdata = canvas.toDataURL("image/png");
+
+//      var pngimg = '<img src="'+canvasdata+'">'; 
+//      d3.select("#pngdataurl").html(pngimg);
+
+
+      var a = document.createElement("a");
+      a.download = "grid.png";
+      a.href = canvasdata;
+      a.click();
+
+
+
+/*  
+
+  var image = new Image;
+  image.src = imgsrc;
+  image.onload = function() {
+      context.drawImage(image, 0, 0);//test
+
+      var canvasdata = canvas.toDataURL("image/png");
+
+      var pngimg = '<img src="'+canvasdata+'">'; 
+      d3.select("#pngdataurl").html(pngimg);
+
+
+      var a = document.createElement("a");
+      a.id = "imagepng";//test
+      a.download = "sample.png";
+      a.href = canvasdata;
+      a.click();
+    };*/
+  };
+
+
+
+
+
+    </script>
+
+    
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script><!-- jQuery first, then Tether, then Bootstrap JS. 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>-->
+  </body>
+</html>
