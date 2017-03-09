@@ -1077,14 +1077,15 @@ var canvasdata = canvas.toDataURL("image/png");
 
 d3.select("canvas").attr("width",paperCalcWidth).attr("height",paperCalcHeight);
 
-var canvas = document.querySelector("canvas")//,      context = canvas.getContext("2d");
+var canvas = document.querySelector("canvas"),
+      context = canvas.getContext("2d");
 
 canvg(canvas, imgsrc);
 
 var canvasdata = canvas.toDataURL("image/png");
 
-//      var pngimg = '<img src="'+canvasdata+'">'; 
-//      d3.select("#pngdataurl").html(pngimg);
+      var pngimg = '<img src="'+canvasdata+'">'; 
+      d3.select("#pngdataurl").html(pngimg);
 
 
       var a = document.createElement("a");
