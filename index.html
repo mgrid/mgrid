@@ -1066,7 +1066,7 @@ var canvasdata = canvas.toDataURL("image/png");
  function savePNG(paperCalcWidth,paperCalcHeight){
   var html = d3.select("paper").select("svg")
         .attr("version", 1.1)
-        .attr("xmlns", "https://www.w3.org/2000/svg")
+        .attr("xmlns", "http://www.w3.org/2000/svg")
         .node().parentNode.innerHTML;
 
   //console.log(html);
