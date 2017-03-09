@@ -1077,8 +1077,7 @@ var canvasdata = canvas.toDataURL("image/png");
 
 d3.select("canvas").attr("width",paperCalcWidth).attr("height",paperCalcHeight);
 
-var canvas = document.querySelector("canvas"),
-      context = canvas.getContext("2d");
+var canvas = document.querySelector("canvas")//,      context = canvas.getContext("2d");
 
 canvg(canvas, imgsrc);
 
