@@ -50,9 +50,6 @@
 
 
 
-<canvas style="display:none"></canvas>
-<div id="svgdataurl"></div>
-<div id="pngdataurl"></div>
 
 
 
@@ -551,15 +548,20 @@ function switchVisibility() {
   </div>
 
   <paper style="position: absolute;">
-    <svg id="mainSVG" style="position: absolute;"><rect class="paperrect"></rect></svg>
-    
+    <svg id="mainSVG" style="position: absolute;">
+    <rect class="paperrect"></rect></svg>
+
   </paper>
+  <div class="supercanvas">
+  <canvas id="canvas" style="position: absolute; display:none;"></canvas></div>
   <div class="options">
-    <div class="option" style="cursor:pointer;" onclick="savePNG('paperCalcWidth','paperCalcHeight')">PICTURE</div>
-    <div class="option" style="cursor:pointer;" onclick="saveSVG('paperCalcWidth','paperCalcHeight')">VECTOR</div>
+    <div class="option" id="downloadPNG" style="cursor:pointer;" onclick="savePNG(x+paperCalcWidth,y+paperCalcHeight)">PICTURE</div>
+    <div class="option" style="cursor:pointer;" onclick="saveSVG(width,height)">VECTOR</div>
     </div>
 
-    <script>
+
+    <script>    
+
     var cG = 0;
     var gridEnable=[1,0,0];
     var gridVisible=[1,0,0];
@@ -583,6 +585,10 @@ function switchVisibility() {
     var paperWidth=2540;
     var paperHeight=1905;
     var paperScale;
+    var x, y;
+
+    var paperCalcWidth;
+    var paperCalcHeight;
 
 
       var columnsAmnt=[6,3,2];
@@ -639,6 +645,12 @@ switchVis.append("text")
 .attr("font-size","12");
 
 document.getElementById("switchvis").style.visibility = "hidden";
+
+if (checkSafari()) {
+document.getElementById("downloadPNG").style.visibility = "hidden";    
+}
+
+
 
 
 
@@ -867,18 +879,24 @@ function arrows(key,id) {
         { 
             paperScale = (0.7 * paperCenterY*2) / paperHeight; 
         }
-        var paperCalcWidth = paperScale * paperWidth;
-        var paperCalcHeight = paperScale * paperHeight;
+        paperCalcWidth = paperScale * paperWidth;
+        paperCalcHeight = paperScale * paperHeight;
 
-        var x = paperCenterX - paperCalcWidth/2;
-        var y = paperCenterY - paperCalcHeight/2;
+        x = paperCenterX - paperCalcWidth/2;
+        y = paperCenterY - paperCalcHeight/2;
 
         var positionSVG = document.getElementById("mainSVG");
         positionSVG.style.left = x;
         positionSVG.style.top = y;
         positionSVG.style.width = paperCalcWidth;
         positionSVG.style.height = paperCalcHeight;
-
+/*
+        var positionCanvas = document.getElementById("canvas");
+        positionCanvas.style.left = x;
+        positionCanvas.style.top = y;
+        positionCanvas.style.width = paperCalcWidth;
+        positionCanvas.style.height = paperCalcHeight;
+*/
         d3.select("paper").select("svg").select("rect")
         .attr("x",0)
         .attr("y",0)
@@ -921,7 +939,7 @@ for (var j=0; j<3; j++)
 var groupRows = [tmpGroupRows[2], tmpGroupRows[1], tmpGroupRows[0]];
 var groupColumns = [tmpGroupColumns[2], tmpGroupColumns[1], tmpGroupColumns[0]];
 
-drawGrid();
+drawGrid();  
 
 function drawGrid(){
     
@@ -1006,7 +1024,7 @@ function controlsUpdate(){
 
 
 
- function saveSVG(paperCalcWidth,paperCalcHeight){
+ function saveSVG(width,height){
   var html = d3.select("paper").select("svg")
         .attr("version", 1.1)
         .attr("xmlns", "http://www.w3.org/2000/svg")
@@ -1037,10 +1055,10 @@ var canvasdata = canvas.toDataURL("image/png");
       a.href = canvasdata;
       a.click();
 */
-      var a2 = document.createElement("a");
-      a2.download = "grid.svg";
-      a2.href = imgsrc;
-      a2.click();
+      var a = document.createElement("a");
+      a.download = "grid.svg";
+      a.href = imgsrc;
+      a.click();
 
 /*  
 
@@ -1065,37 +1083,137 @@ var canvasdata = canvas.toDataURL("image/png");
 
 
 
- function savePNG(paperCalcWidth,paperCalcHeight){
+
+
+ function savePNG(width,height){
+
+
+//d3.select("canvas").attr("width",paperCalcWidth).attr("height",paperCalcHeight);
+//d3.select("canvas").style("width",width).style("height",height).style("left",100);
+d3.select("canvas").attr("width",x+paperCalcWidth).attr("height",y+paperCalcHeight);
+
+
+
+  var html = d3.select("paper").select("svg")
+        .attr("version", 1.1)
+        .attr("xmlns", "http://www.w3.org/2000/svg")
+        .node().parentNode.innerHTML;
+
+  var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
+
+
+
+var image = new Image;
+image.src = imgsrc;
+
+var canvas = document.querySelector("canvas");
+var context = canvas.getContext("2d");
+
+canvg(canvas, imgsrc);
+
+/*
+canvas.width = 702;//*paperWidth;
+canvas.height = 527;//*paperHeight;
+canvas.left=100;
+*/
+//context.drawImage(image, 0, 0, 702, 527);//, 2*canvas.width, 2*canvas.height);
+//context.drawImage(image, 0, 0, 2000, 2000);
+//context.drawImage(image, x, y, paperCalcWidth, paperCalcHeight, 0, 0, 200,200);//2*paperCalcWidth, 2*paperCalcHeight);
+//context.drawImage(image, 0, 0);//2*paperCalcWidth, 2*paperCalcHeight);
+  var a = document.createElement("a");
+  a.download = "fallback.png";
+  a.href = canvas.toDataURL("image/png");
+  a.click();
+
+/*
+image.onload = function() {
+  context.drawImage(image, 0, 0);
+
+  var a = document.createElement("a");
+  a.download = "fallback.png";
+  a.href = canvas.toDataURL("image/png");
+  a.click();
+};
+
+
+
+
+/*
+
+
   var html = d3.select("paper").select("svg")
         .attr("version", 1.1)
         .attr("xmlns", "http://www.w3.org/2000/svg")
         .node().parentNode.innerHTML;
 
   //console.log(html);
-  var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
-/*  var img = '<img src="'+imgsrc+'">'; 
-  d3.select("#svgdataurl").html(img);
-*/
+ var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
+//  var img = '<img src="'+imgsrc+'">'; 
+//  d3.select("#svgdataurl").html(img);
 
-d3.select("canvas").attr("width",paperCalcWidth).attr("height",paperCalcHeight);
+
+d3.select("canvas").attr("width",paperWidth).attr("height",paperHeight);
 
 var canvas = document.querySelector("canvas"),
       context = canvas.getContext("2d");
 
+//canvas.width = paperWidth;
+//canvas.height = paperHeight;
+
+//context.drawImage(imgsrc, 0, 0);
 canvg(canvas, imgsrc);
 
 var canvasdata = canvas.toDataURL("image/png");
 
-      var pngimg = '<img src="'+canvasdata+'">'; 
-      d3.select("#pngdataurl").html(pngimg);
+//      var pngimg = '<img src="'+canvasdata+'">'; 
+//      d3.select("#pngdataurl").html(pngimg);
 
 
       var a = document.createElement("a");
       a.download = "grid.png";
       a.href = canvasdata;
       a.click();
+/*
 
-saveSvgAsPng(document.getElementById("canvas"), "diagram.png");
+var image = new Image();
+image.src = 'data:image/svg+xml;base64,'+ btoa(html);//'data:image/svg+xml;base64,' + window.btoa(xml);
+
+image.onload = function() {
+  var canvas = document.querySelector("canvas");
+  canvas.width = paperWidth;
+  canvas.height = paperHeight;
+  var context = canvas.getContext('2d');
+  context.drawImage(image, 0, 0);
+ 
+  var a = document.createElement('a');
+  a.download = "image.png";
+  a.href = canvas.toDataURL('image/png');
+  document.body.appendChild(a);
+  a.click();
+}
+*/
+
+/*
+var svgString = new XMLSerializer().serializeToString(document.querySelector('svg'));
+//d3.select("canvas").attr("width",paperCalcWidth).attr("height",paperCalcHeight); //?
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var DOMURL = self.URL || self.webkitURL || self;
+var img = new Image();
+var svg = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"});
+var url = DOMURL.createObjectURL(svg);
+img.onload = function() {
+    ctx.drawImage(img, 0, 0);
+    var png = canvas.toDataURL("image/png");
+    document.querySelector('#png-container').innerHTML = '<img src="'+png+'"/>';
+    DOMURL.revokeObjectURL(png);
+};
+img.src = url;
+*/
+
+
+
 
 /*  
 
@@ -1118,9 +1236,11 @@ saveSvgAsPng(document.getElementById("canvas"), "diagram.png");
     };*/
   };
 
-
-
-
+function checkSafari() {
+    if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) 
+    {return 0;}//1;}
+    return 0;
+}
 
     </script>
 
