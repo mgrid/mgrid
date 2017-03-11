@@ -34,20 +34,9 @@
 
   <div class="panel" id="panel">
 
-    <div class="gridswitch padding-left">
+ 
 
-<input type="button" onclick="switchGrid(0)" class="switchbtn btnroundleft" id="switchGrid0" value="GRID 1"></input>
-<input type="button" onclick="switchGrid(1)" class="switchbtn" id="switchGrid1" style="display: none;" value="GRID 2"></input>
-<input type="button" onclick="switchGrid(2)" class="switchbtn btnroundright" id="switchGrid2" style="display: none;" value="GRID 3"></input>
-<button type="submit" onclick="addGrid()" class="switchbtn addswitchbtn btnroundright" id="addGrid"><i class="fa fa-plus" aria-hidden="true"></i></button>
 
-</div>
-
-<switch id="switchvis" class="switchvis padding-left" onclick="switchVisibility()">
-  <svg style="width:130px; height:14px;"></svg>
-</switch>
-
-<div class="devider-xs"></div>
 
 
 
@@ -85,6 +74,26 @@
         onfocusout="enterValue(this,'paperHeight','click')"  value=1905>
         <div class="spnr-units"></div>
       </div>
+
+
+
+
+   <div class="gridswitch padding-left">
+
+<input type="button" onclick="switchGrid(0)" class="switchbtn btnroundleft" id="switchGrid0" value="GRID 1"></input>
+<input type="button" onclick="switchGrid(1)" class="switchbtn" id="switchGrid1" style="display: none;" value="GRID 2"></input>
+<input type="button" onclick="switchGrid(2)" class="switchbtn btnroundright" id="switchGrid2" style="display: none;" value="GRID 3"></input>
+<button type="submit" onclick="addGrid()" class="switchbtn addswitchbtn btnroundright" id="addGrid"><i class="fa fa-plus" aria-hidden="true"></i></button>
+
+</div>
+
+<switch id="switchvis" class="switchvis padding-left" onclick="switchVisibility()">
+  <svg style="width:130px; height:14px;"></svg>
+</switch>
+
+<div class="devider-xs"></div>
+
+
 
     <script>
 
@@ -423,6 +432,7 @@ function switchVisibility() {
                 onkeydown="arrows(this,'columnWidth')"
                 onkeyup="enterValue(this,'columnWidth','enter')" 
                 onfocusout="enterValue(this,'columnWidth','click')" value=60>
+                <div class="show-mul spnr-units"></div>
               </div>    
 
               <div class="spnr">
@@ -431,6 +441,7 @@ function switchVisibility() {
                 onkeydown="arrows(this,'rowHeight')"
                 onkeyup="enterValue(this,'rowHeight','enter')" 
                 onfocusout="enterValue(this,'rowHeight','click')" value=30>
+                <div class="show-mul spnr-units"></div>
               </div>     
 <div class="devider-s"></div>
 
@@ -440,6 +451,7 @@ function switchVisibility() {
                 onkeydown="arrows(this,'gutterWidth')"
                 onkeyup="enterValue(this,'gutterWidth','enter')" 
                 onfocusout="enterValue(this,'gutterWidth','click')" value=20>
+                <div class="show-mul spnr-units"></div>
               </div>     
 
               <div class="spnr gutter-width">
@@ -448,8 +460,18 @@ function switchVisibility() {
                 onkeydown="arrows(this,'gutterHeight')" 
                 onkeyup="enterValue(this,'gutterHeight','enter')" 
                 onfocusout="enterValue(this,'gutterHeight','click')" value=10>
+                <div class="show-mul spnr-units"></div>
               </div>      
 
+            <div class="devider-mul padding-left"><hr></div>
+
+           
+                <div class="spnr-title-mul padding-left">Multiply coefficient</div>
+                <input type="text" id="spnr-in-mul" class="spnr-in-mul" 
+                onkeydown="arrows(this,'mul')"
+                onkeyup="enterValue(this,'mul','enter')" 
+                onfocusout="enterValue(this,'mul','click')" value=1>
+                
 
 <!--
 
@@ -595,7 +617,7 @@ document.location = "mobile.html";
     var paperCalcWidth;
     var paperCalcHeight;
 
-
+var mul = 1;
       var columnsAmnt=[6,3,2];
       var columnWidth=[320,700,700];
       var gutterWidth=[60,60,60];
@@ -665,13 +687,8 @@ function arrows(key,id) {
 }
 
 
-
-      function enterValue(key,id,flag) {
-//        if((event.keyCode > 47 && event.keyCode<58) || (event.keyCode==8) || (event.keyCode==13) || (event.keyCode==46)) {
-    if(event.keyCode == 27)
-    {
-        controlsUpdate();
-    document.getElementById('spnr-in-ppr-wdth').blur();
+function controlsUnfocus() {
+        document.getElementById('spnr-in-ppr-wdth').blur();
     document.getElementById('spnr-in-clmn-amnt').blur();
     document.getElementById('spnr-in-clmn-wdth').blur();
     document.getElementById('spnr-in-gttr-wdth').blur();
@@ -681,7 +698,13 @@ function arrows(key,id) {
     document.getElementById('spnr-in-row-hght').blur();
     document.getElementById('spnr-in-gttr-hght').blur();
     document.getElementById('spnr-in-height').blur();
-    } 
+    document.getElementById('spnr-in-mul').blur();
+}
+
+
+      function enterValue(key,id,flag) {
+//        if((event.keyCode > 47 && event.keyCode<58) || (event.keyCode==8) || (event.keyCode==13) || (event.keyCode==46)) {
+ 
 
 
 
@@ -808,10 +831,10 @@ function arrows(key,id) {
             break;
 
             case "columnWidth":
-            tmp=calcWidth(columnsAmnt[cG],key.value,gutterWidth[cG]);
+            tmp=calcWidth(columnsAmnt[cG],key.value*mul,gutterWidth[cG]);
             if (tmp<=paperWidth && key.value>0)
             {
-                columnWidth[cG]=key.value;
+                columnWidth[cG]=key.value*mul;
                 width[cG]=tmp;
             }
             else
@@ -821,10 +844,10 @@ function arrows(key,id) {
             break;
 
             case "rowHeight":
-            tmp=calcHeight(rowsAmnt[cG],key.value,gutterHeight[cG]);
+            tmp=calcHeight(rowsAmnt[cG],key.value*mul,gutterHeight[cG]);
             if (tmp<=paperHeight && key.value>0)
             {
-                rowHeight[cG]=key.value;
+                rowHeight[cG]=key.value*mul;
                 height[cG]=tmp;
             }
             else
@@ -834,10 +857,10 @@ function arrows(key,id) {
             break;             
 
             case "gutterWidth":
-            tmp=calcWidth(columnsAmnt[cG],columnWidth[cG],key.value);
+            tmp=calcWidth(columnsAmnt[cG],columnWidth[cG],key.value*mul);
             if (tmp<=paperWidth && key.value>0)
             {
-                gutterWidth[cG]=key.value;
+                gutterWidth[cG]=key.value*mul;
                 width[cG]=tmp;
             }
             else
@@ -847,10 +870,10 @@ function arrows(key,id) {
             break;
 
             case "gutterHeight":
-            tmp=calcHeight(rowsAmnt[cG],rowHeight[cG],key.value);
+            tmp=calcHeight(rowsAmnt[cG],rowHeight[cG],key.value*mul);
             if (tmp<=paperHeight && key.value>0)
             {
-                gutterHeight[cG]=key.value;
+                gutterHeight[cG]=key.value*mul;
                 height[cG]=tmp;
             }
             else
@@ -858,12 +881,48 @@ function arrows(key,id) {
             }            
 //            document.getElementById('spnr-in-gttr-hght').value=gutterHeight[cG]; 
             break; 
+
+            case "mul":
+            if (key.value>0 && key.value<1000)
+            {
+                mul=key.value;
+                
+                    var mulPointers = document.getElementsByClassName("show-mul");
+                    for (var i=0; i<mulPointers.length; i++)
+                    {
+                        if (mul>1)
+                        {
+                            mulPointers[i].innerHTML="x"+mul;
+                        }
+                        else
+                        {
+                            mulPointers[i].innerHTML="";
+                        }
+                    }
+                
+            }
+            else
+            {
+            }            
+//            document.getElementById('spnr-in-gttr-hght').value=gutterHeight[cG]; 
+            break; 
+
           }
 //          document.getElementById('spnr-in-width').value=width[cG];
 //          document.getElementById('spnr-in-height').value=height[cG]; 
           controlsUpdate();
           drawGrid();
+          if (event.keyCode == 13)
+            {controlsUnfocus();}
         }
+
+
+    if(event.keyCode == 27)
+    {
+        controlsUpdate();
+        controlsUnfocus();
+    }
+
       }
 
 
@@ -1013,14 +1072,15 @@ function calcHeight(rA, rH, gH)  {return rA*rH + (rA-1)*gH;}
 function controlsUpdate(){
     document.getElementById('spnr-in-ppr-wdth').value=paperWidth; 
     document.getElementById('spnr-in-clmn-amnt').value=columnsAmnt[cG];
-    document.getElementById('spnr-in-clmn-wdth').value=columnWidth[cG]; 
-    document.getElementById('spnr-in-gttr-wdth').value=gutterWidth[cG]; 
+    document.getElementById('spnr-in-clmn-wdth').value=columnWidth[cG]/mul; 
+    document.getElementById('spnr-in-gttr-wdth').value=gutterWidth[cG]/mul; 
     document.getElementById('spnr-in-width').value=width[cG];
     document.getElementById('spnr-in-ppr-hght').value=paperHeight; 
     document.getElementById('spnr-in-row-amnt').value=rowsAmnt[cG]; 
-    document.getElementById('spnr-in-row-hght').value=rowHeight[cG];
-    document.getElementById('spnr-in-gttr-hght').value=gutterHeight[cG]; 
-    document.getElementById('spnr-in-height').value=height[cG]; 
+    document.getElementById('spnr-in-row-hght').value=rowHeight[cG]/mul;
+    document.getElementById('spnr-in-gttr-hght').value=gutterHeight[cG]/mul; 
+    document.getElementById('spnr-in-height').value=height[cG];
+    document.getElementById('spnr-in-mul').value=mul; 
 }
 
 
