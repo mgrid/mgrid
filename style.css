@@ -345,3 +345,29 @@ body {
 .dropdownButton:hover {background-color: #01C6CA}
 
 .show {display:block;}
+
+.m-name {
+	padding-top: 10%;
+	padding-bottom: 5%;
+	font-family: Roboto Slab, sans-serif;
+	font-size: 64px;
+	font-weight: 800;
+	color: #ffffff;
+	width: 100%;
+	text-align: center;
+}
+
+.m-picture {
+	text-align: center;
+	opacity: 0.3;
+}
+
+.m-message {
+	padding-top: 5%;
+	font-family: Roboto, sans-serif;
+	font-size: 18px;
+	font-weight: 300;
+	color: #ffffff;
+	width: 100%;
+	text-align: center;
+}
