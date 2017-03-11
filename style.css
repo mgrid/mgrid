@@ -350,7 +350,7 @@ body {
 	padding-top: 10%;
 	padding-bottom: 5%;
 	font-family: Roboto Slab, sans-serif;
-	font-size: 64px;
+	font-size: 32px;
 	font-weight: 800;
 	color: #ffffff;
 	width: 100%;
@@ -364,10 +364,11 @@ body {
 
 .m-message {
 	padding-top: 5%;
+	padding-left: 20%;
+	padding-right: 20%;
 	font-family: Roboto, sans-serif;
-	font-size: 18px;
+	font-size: 12px;
 	font-weight: 300;
 	color: #ffffff;
-	width: 100%;
 	text-align: center;
 }
