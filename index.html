@@ -861,6 +861,9 @@ function arrows(key,id) {
         }
       }
 
+if (screen.width <= 699) {
+document.location = "mobile.html";
+}
     
     paperSizeRecalc();
 
@@ -871,7 +874,7 @@ function arrows(key,id) {
         var paperCenterX = (window.outerWidth - panelWidth) / 2;
         var paperCenterY = window.outerHeight / 2 - toppanelHeight;
 
-        if (paperWidth > paperHeight)
+        if (paperWidth < paperHeight)
         {
             paperScale = (0.7 * paperCenterX*2) / paperWidth;
         }
