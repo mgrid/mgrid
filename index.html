@@ -247,8 +247,8 @@ var mainColor = "#00D5D7";
 var colorGridVert = ["#0092D7","#8C6600","#541D00"];
 var colorGridHor = [mainColor,"#8C6600","#541D00"];
 
-var colorGridHorFill = ["transparent","#FFCC40","#FF7627"];
 var colorGridVertFill = ["transparent","#FFBA00","#FF7627"];
+var colorGridHorFill = ["#f3fdfd","#FFCC40","#FF7627"];
 var opacityGridHor = [1,0.3,0.25];
 var opacityGridvert = [1,0.3,0.25];
 
@@ -333,8 +333,8 @@ for (var j=0; j<3; j++)
     tmpGroupColumns[j] = d3.select("paper").select("svg").append("g");    
 }
 
-var groupRows = [tmpGroupRows[2], tmpGroupRows[1], tmpGroupRows[0]];
-var groupColumns = [tmpGroupColumns[2], tmpGroupColumns[1], tmpGroupColumns[0]];
+var groupRows = [tmpGroupRows[0], tmpGroupRows[1], tmpGroupRows[2]];
+var groupColumns = [tmpGroupColumns[0], tmpGroupColumns[1], tmpGroupColumns[2]];
 
 drawGrid();  
 paperSizeRecalc();
@@ -685,9 +685,9 @@ function changePaper (id)
         columnsAmnt = [6,12,1];
         columnWidth = [160,72,1040];
         gutterWidth = [16,16,16];
-        rowsAmnt = [25,25,12];
-        rowHeight = [32,32,96];
-        gutterHeight = [32,32,32];
+        rowsAmnt = [16,16,10];
+        rowHeight = [48,48,96];
+        gutterHeight = [48,48,48];
         units = "px";                
         break;
 
